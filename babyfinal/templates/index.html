@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="index,follow">
+    <meta name="generator" content="GrapesJS Studio">
+</head>
+
+<body id="iau9">
+    <!-- Color Bar -->
+    <title id="i93ky">Home</title>
+    <meta charset="utf-8" id="ikr19" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" id="iuzgk" />
+    <meta name="robots" content="index,follow" id="ibyal" />
+    <meta name="generator" content="GrapesJS Studio" id="it98k" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" id="ij0jh" />
+    <title id="i9069">Babycare</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" id="i80lq" />
+    <div class="color-bar" id="i668i">
+        Predict baby crying causes with Advance AI
+    </div>
+    <header id="iacgk">
+        <div><b> Babycare</b> </div>
+        <nav><a href="#" class="gjs-link">Home</a><a href="#" class="gjs-link">Upload</a><a href="#"
+                class="gjs-link">Record</a><a href="#" class="gjs-link">Contact</a></nav>
+        <button type="button" class="get-started">Get Started</button>
+    </header>
+    <div class="content" id="irb51">
+        <div id="iswlm">
+            <h1 class="gjs-heading" id="i0bul">Understand Your Baby's Needs Today</h1>
+            <p id="ii22g">Unlock the mystery behind your baby’s cries. With our AI model, effortlessly decode the
+                reasons for
+                crying by simply uploading an audio clip or recording live.</p><!-- Upload Form -->
+            <form method="get" id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" id="iwc1q"/>
+                <button type="submit" class="upload-button" id="i5kjm">Upload</button>
+                <button type="button" id="recordButton">Record</button>
+            </form>
+            <audio id="audioPlayback" controls></audio><!-- Placeholder for the prediction result -->
+            <div id="predictionResult">
+                <!-- Prediction result will be displayed here -->
+            </div>
+        </div><img src="{{ url_for('static', filename='baby1cry.jpg') }}" alt="Description of image" width="600" height="700" id="i32kw"/>
+    </div>
+    <div class="footer" id="ix59c"><b id="i3kc8"> Empowering parents through technology</b></div>
+    <script>
+        // File upload form submission
+        document.getElementById('uploadForm').onsubmit = async function(event) {
+            event.preventDefault();
+            
+            const fileField = document.querySelector('input[type="file"]');
+            
+            if (fileField.files.length === 0) {
+                alert('Please select a file to upload.');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileField.files[0]);
+            
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    alert('Error: ' + response.statusText);
+                    return;
+                }
+        
+                const result = await response.json();
+                console.log(result);  // Debug: check what is being returned
+        
+                if (result.error) {
+                    alert('Error: ' + result.error);
+                } else {
+                    // Display the prediction result on the webpage
+                    document.getElementById('predictionResult').innerText = 'Prediction: ' + result.result;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred during file upload');
+            }
+        };
+    
+        // Recording functionality
+        let mediaRecorder;
+        let recordedChunks = [];
+    
+        document.getElementById('recordButton').addEventListener('click', async function() {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        });
+    
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+    
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+    
+                mediaRecorder.onstop = function() {
+                    const audioBlob = new Blob(recordedChunks, { type: 'audio/wav' });
+                    const formData = new FormData();
+                    formData.append('file', audioBlob, 'recordedAudio.wav');
+    
+                    // Now send the recorded audio blob to the server
+                    fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        console.log('Prediction result:', result);
+                        document.getElementById('predictionResult').innerText = 'Prediction: ' + result.result;
+                    })
+                    .catch(error => {
+                        console.error('Error uploading audio:', error);
+                    });
+                };
+    
+                mediaRecorder.start();
+                document.getElementById('recordButton').textContent = 'Stop Recording';
+            } catch (err) {
+                console.error('Error accessing microphone:', err);
+            }
+        }
+    
+        function stopRecording() {
+            mediaRecorder.stop();
+            document.getElementById('recordButton').textContent = 'R';
+        }
+    </script>
+    
+</body>
+
+</html>
