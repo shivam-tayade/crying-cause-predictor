@@ -24,4 +24,6 @@ This project is a web-based application that uses an AI model to predict the cau
 - **Google Colab:** For training and testing the machine learning model.
 
 ## Link to Demo Video or Screenshots  
-(Screenshot of Web Interface)
+### Screenshot of Web Interface
+![Web Interface Screenshot](webpage.png)
+![Web Interface Screenshot](webpage2.png)
