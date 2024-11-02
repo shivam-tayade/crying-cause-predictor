@@ -1,4 +1,5 @@
-# Crying Cause Predictor
+# Baby Care
+
 
 ## Project Overview  
 This project is a web-based application that uses an AI model to predict the cause of a baby’s crying. The user can upload or record an audio clip of the baby's cry, and the machine learning model analyzes the audio to determine the reason behind the cry (e.g., hunger, discomfort, etc.). The model was developed in Python using Google Colab and integrated into a user-friendly web interface.
